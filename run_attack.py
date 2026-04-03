@@ -92,7 +92,6 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 
 parser.add_argument("--data-dir",           type=str,   default="/path/to/dataset", help="Root directory for datasets")
 parser.add_argument("--dataset",            type=str,   default="mag", choices=["Citeseer", "Pubmed", "arxiv", "mag"])
-parser.add_argument("--data_device",        type=str,   default="cpu")
 parser.add_argument("--seed",               type=int,   default=5)
 
 # Model checkpoint paths

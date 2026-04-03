@@ -33,7 +33,7 @@ def setup_logging():
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # Data parameters
-parser.add_argument("--data-dir",           type=str,   default="/data1/home/ha2/dataset/pyg_data")
+parser.add_argument("--data-dir",           type=str,   default="/path/to/dataset.")
 parser.add_argument("--dataset",            type=str,   default="arxiv", choices=["Citeseer", "Pubmed", "arxiv", "mag"])
 parser.add_argument("--make-undirected",    action="store_true", default=True)
 parser.add_argument("--binary-attr",        action="store_true", default=False)
@@ -52,7 +52,7 @@ parser.add_argument("--max-epochs",         type=int,   default=3000)
 parser.add_argument("--display-steps",      type=int,   default=100)
 
 # Fine-tuning parameters (Set to 0 to skip)
-parser.add_argument("--fine-tune-epochs",   type=int,   default=0, help="If > 0, do Manifold-Smoothed Fine-tuning")
+parser.add_argument("--fine-tune-epochs",   type=int,   default=40, help="If > 0, do Manifold-Smoothed Fine-tuning")
 parser.add_argument("--lambda_dcg",         type=float, default=1)
 parser.add_argument("--sigma",              type=float, default=0.03)
 parser.add_argument("--temperature",        type=float, default=6.0)
