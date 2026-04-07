@@ -202,7 +202,7 @@ def main(args):
     logging.info(f"Test accuracy: {test_acc:.4f}  (seed={args.seed})")
 
     # ── save model checkpoint ───────────────────────────────────────────────
-    cache_dir = Path(args.artifact_dir) / args.model_type  # ← 加 surrogate/victim 子目录
+    cache_dir = Path(args.cpt_saved_dir) / args.model_type  
     cache_dir.mkdir(parents=True, exist_ok=True)
     model_name = f"{args.dataset}-{args.model}-seed-{args.seed}.pt"
     model_path = cache_dir / model_name
