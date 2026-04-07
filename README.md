@@ -22,7 +22,7 @@ pip install pyg_lib torch_scatter torch_sparse torch_cluster -f https://data.pyg
 ```
 
 ## Datasets
-We evaluate the proposed method on the ArXiv, MAG, Citeseer, and Pubmed datasets. The code automatically downloads the required dataset to the path specified by --data-dir according to the --dataset argument. 
+We evaluate the proposed method on the ArXiv, MAG, Citeseer, and Pubmed datasets. The code automatically downloads the required dataset to the path specified by `--data-dir` according to the `--dataset` argument. 
 
 ## Models
 We evaluate the proposed method on GCN, SGC, GAT, and GraphSAGE models.
@@ -36,7 +36,7 @@ Here we take training a surrogate model on ArXiv as an example:
 python run_train.py --data-dir /path/to/dataset --dataset arxiv --model GCN --seed 0
 ```
 
-After execution, the surrogate model will be saved to /cache/victim/.
+After execution, the surrogate model will be saved to `./cache/victim/`.
 
 If you prefer to directly use the surrogate model from our paper, we have also provided the pre-trained version in our repository under /cache/victim/.
 
