@@ -36,7 +36,7 @@ Here we take training a surrogate model on ArXiv as an example:
 python run_train.py --data-dir /path/to/dataset --dataset arxiv --model GCN --seed 0
 ```
 
-After execution, the surrogate model will be saved to `./cache/victim/`.
+After execution, the surrogate model will be saved to `./cache/surrogate/`.
 
 If you prefer to directly use the surrogate model from our paper, we have also provided the pre-trained version in our repository under `./cache/surrogate/`.
 
