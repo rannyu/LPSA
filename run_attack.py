@@ -95,6 +95,8 @@ parser.add_argument("--dataset",            type=str,   default="mag", choices=[
 parser.add_argument("--seed",               type=int,   default=5)
 
 # Model checkpoint paths
+parser.add_argument("--cpt_saved_dir",       type=str,   default="cache")
+# Victim model backbone
 parser.add_argument("--victim_model",       type=str,   default="SGC", choices=["GCN", "SGC", "GAT", "GraphSAGE",])
 
 # Attack hyperparameters
@@ -114,7 +116,7 @@ def main(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
    
     # ── 2. Build paths and load models ────────────────────────────────
-    cache_path = Path("./cache")
+    cache_path = Path(args.cpt_saved_dir)
     victim_dir = cache_path / "victim"
     surrogate_dir = cache_path / "surrogate"
     
