@@ -33,32 +33,29 @@ def setup_logging():
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # Data parameters
-parser.add_argument("--data-dir",           type=str,   default="/path/to/dataset.")
+parser.add_argument("--data_dir",           type=str,   default="/path/to/dataset.")
 parser.add_argument("--dataset",            type=str,   default="arxiv", choices=["Citeseer", "Pubmed", "arxiv", "mag"])
-parser.add_argument("--make-undirected",    action="store_true", default=True)
-parser.add_argument("--binary-attr",        action="store_true", default=False)
 parser.add_argument("--seed",               type=int,   default=5)
 
 # Model parameters
 parser.add_argument("--model",              type=str,   default="GAT", choices=["GCN", "SGC", "GAT", "GraphSAGE", ])
 parser.add_argument("--model_type",         type=str,   default="victim", choices=["victim", "surrogate"], help="Model role: victim or surrogate")
-# parser.add_argument("--n_filters",          type=int,   default=256, help="Number of hidden filters in the GNN layers")
 
 # Training parameters
 parser.add_argument("--lr",                 type=float, default=1e-2)
-parser.add_argument("--weight-decay",       type=float, default=1e-7)
+parser.add_argument("--weight_decay",       type=float, default=1e-7)
 parser.add_argument("--patience",           type=int,   default=300)
-parser.add_argument("--max-epochs",         type=int,   default=3000)
-parser.add_argument("--display-steps",      type=int,   default=100)
+parser.add_argument("--max_epochs",         type=int,   default=3000)
+parser.add_argument("--display_steps",      type=int,   default=100)
 
 # Fine-tuning parameters (Set to 0 to skip)
-parser.add_argument("--fine-tune-epochs",   type=int,   default=40, help="If > 0, do Manifold-Smoothed Fine-tuning")
+parser.add_argument("--fine_tune_epochs",   type=int,   default=40, help="If > 0, do Manifold-Smoothed Fine-tuning")
 parser.add_argument("--lambda_dcg",         type=float, default=1)
 parser.add_argument("--sigma",              type=float, default=0.03)
 parser.add_argument("--temperature",        type=float, default=6.0)
 
 # Output parameters
-parser.add_argument("--artifact-dir",       type=str,   default="cache")
+parser.add_argument("--cpt_saved_dir",       type=str,   default="cache")
 parser.add_argument("--output",             type=str,   default="output/train")
 
 def main(args):
