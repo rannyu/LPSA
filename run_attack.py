@@ -95,7 +95,7 @@ parser.add_argument("--dataset",            type=str,   default="mag", choices=[
 parser.add_argument("--seed",               type=int,   default=5)
 
 # Model checkpoint paths
-parser.add_argument("--cpt_saved_dir",       type=str,   default="cache")
+parser.add_argument("--cpt_saved_dir",       type=str,   default="./cache")
 # Victim model backbone
 parser.add_argument("--victim_model",       type=str,   default="SGC", choices=["GCN", "SGC", "GAT", "GraphSAGE",])
 
