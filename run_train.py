@@ -55,7 +55,7 @@ parser.add_argument("--sigma",              type=float, default=0.03)
 parser.add_argument("--temperature",        type=float, default=6.0)
 
 # Output parameters
-parser.add_argument("--cpt_saved_dir",       type=str,   default="cache")
+parser.add_argument("--cpt_saved_dir",       type=str,   default="./cache")
 parser.add_argument("--output",             type=str,   default="output/train")
 
 def main(args):
