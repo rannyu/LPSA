@@ -39,7 +39,7 @@ parser.add_argument("--seed",               type=int,   default=5)
 
 # Model parameters
 parser.add_argument("--model",              type=str,   default="GAT", choices=["GCN", "SGC", "GAT", "GraphSAGE", ])
-parser.add_argument("--model_type",         type=str,   default="victim", choices=["victim", "surrogate"], help="Model role: victim or surrogate")
+parser.add_argument("--model_type",         type=str,   default="surrogate", choices=["victim", "surrogate"], help="Model role: victim or surrogate")
 
 # Training parameters
 parser.add_argument("--lr",                 type=float, default=1e-2)
