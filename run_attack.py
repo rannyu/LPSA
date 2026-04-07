@@ -90,7 +90,7 @@ def load_model_from_pt(model_backbone, n_features, n_classes, pt_path, device):
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 
-parser.add_argument("--data-dir",           type=str,   default="/path/to/dataset", help="Root directory for datasets")
+parser.add_argument("--data_dir",           type=str,   default="/path/to/dataset", help="Root directory for datasets")
 parser.add_argument("--dataset",            type=str,   default="mag", choices=["Citeseer", "Pubmed", "arxiv", "mag"])
 parser.add_argument("--seed",               type=int,   default=5)
 
