@@ -52,5 +52,6 @@ This source code is made available for research purposes only.
 
 # Acknowledgment
 Our code is inspired by [P-RBCD](https://github.com/sigeisler/robustness_of_gnns_at_scale) and [lrGAE](https://github.com/EdisonLeeeee/lrGAE).
+
 Great appreciation for their excellent works.
 
