@@ -38,13 +38,13 @@ python run_train.py --data-dir /path/to/dataset --dataset arxiv --model GCN --se
 
 After execution, the surrogate model will be saved to `./cache/victim/`.
 
-If you prefer to directly use the surrogate model from our paper, we have also provided the pre-trained version in our repository under /cache/victim/.
+If you prefer to directly use the surrogate model from our paper, we have also provided the pre-trained version in our repository under `./cache/surrogate/`.
 
 ## Second Stage: Transfer Attack
 Here we take attacking SGC on ArXiv as an example:
 
 ```bash
-python run_train.py --data-dir /path/to/dataset --dataset arxiv --seed 0 --victim_model SGC
+python run_attack.py --data-dir /path/to/dataset --dataset arxiv --seed 0 --victim_model SGC
 ```
 
 # License
