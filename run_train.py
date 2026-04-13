@@ -33,29 +33,32 @@ def setup_logging():
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # Data parameters
-parser.add_argument("--data_dir",           type=str,   default="/path/to/dataset.")
+parser.add_argument("--data-dir",           type=str,   default="/data1/home/ha2/dataset/pyg_data")
 parser.add_argument("--dataset",            type=str,   default="arxiv", choices=["Citeseer", "Pubmed", "arxiv", "mag"])
+parser.add_argument("--make-undirected",    action="store_true", default=True)
+parser.add_argument("--binary-attr",        action="store_true", default=False)
 parser.add_argument("--seed",               type=int,   default=5)
 
 # Model parameters
 parser.add_argument("--model",              type=str,   default="GAT", choices=["GCN", "SGC", "GAT", "GraphSAGE", ])
-parser.add_argument("--model_type",         type=str,   default="surrogate", choices=["victim", "surrogate"], help="Model role: victim or surrogate")
+parser.add_argument("--model_type",         type=str,   default="victim", choices=["victim", "surrogate"], help="Model role: victim or surrogate")
+# parser.add_argument("--n_filters",          type=int,   default=256, help="Number of hidden filters in the GNN layers")
 
 # Training parameters
 parser.add_argument("--lr",                 type=float, default=1e-2)
-parser.add_argument("--weight_decay",       type=float, default=1e-7)
+parser.add_argument("--weight-decay",       type=float, default=1e-7)
 parser.add_argument("--patience",           type=int,   default=300)
-parser.add_argument("--max_epochs",         type=int,   default=3000)
-parser.add_argument("--display_steps",      type=int,   default=100)
+parser.add_argument("--max-epochs",         type=int,   default=3000)
+parser.add_argument("--display-steps",      type=int,   default=100)
 
 # Fine-tuning parameters (Set to 0 to skip)
-parser.add_argument("--fine_tune_epochs",   type=int,   default=40, help="If > 0, do Manifold-Smoothed Fine-tuning")
+parser.add_argument("--fine-tune-epochs",   type=int,   default=40, help="If > 0, do Manifold-Smoothed Fine-tuning")
 parser.add_argument("--lambda_dcg",         type=float, default=1)
 parser.add_argument("--sigma",              type=float, default=0.03)
 parser.add_argument("--temperature",        type=float, default=6.0)
 
 # Output parameters
-parser.add_argument("--cpt_saved_dir",       type=str,   default="./cache")
+parser.add_argument("--artifact-dir",       type=str,   default="cache")
 parser.add_argument("--output",             type=str,   default="output/train")
 
 def main(args):
@@ -135,64 +138,33 @@ def main(args):
                          f"acc_val={accuracy(logits, labels, idx_val):.5f}")
 
     model.load_state_dict(best_state)
-
-    # ── Stage 2: Manifold-Smoothed Fine-tuning ────────────────────────────────
+    
+    # ── Stage 2: Fine-tuning（可选）────────────────────────────────────
     if args.fine_tune_epochs > 0:
         del logits, loss_train, loss_val
         torch.cuda.empty_cache()
 
         ft_optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-
         model.train()
-        for it in tqdm(range(args.max_epochs), desc="Pre-training"):
-            optimizer.zero_grad()
-            logits     = model(attr, adj)
-            loss_train = F.cross_entropy(logits[idx_train], labels[idx_train])
-            loss_val   = F.cross_entropy(logits[idx_val],   labels[idx_val])
-            loss_train.backward()
-            optimizer.step()
 
-            if loss_val < best_loss:
-                best_loss  = loss_val.item()
-                best_epoch = it
-                best_state = {k: v.cpu() for k, v in model.state_dict().items()}
-            elif it >= best_epoch + args.patience:
-                break
+        for ft_it in range(args.fine_tune_epochs):
+            ft_optimizer.zero_grad()
+            attr_noisy  = (attr + torch.randn_like(attr) * args.sigma).detach().requires_grad_(True)
+            logits      = model(attr_noisy, adj)
+            loss_ce     = F.cross_entropy(logits[idx_train], labels[idx_train])
+            log_prob    = F.log_softmax(logits[idx_train] / args.temperature, dim=-1)
+            total_log_p = log_prob[torch.arange(len(idx_train)), labels[idx_train]].sum()
+            grad        = torch.autograd.grad(total_log_p, attr_noisy,
+                                            create_graph=True, retain_graph=True)[0]
+            loss_dcg    = (grad[idx_train] ** 2).sum(dim=1).mean()
+            total_loss  = loss_ce + args.lambda_dcg * loss_dcg
+            total_loss.backward()
+            ft_optimizer.step()
 
-            if it % args.display_steps == 0:
-                logging.info(f"Epoch {it:4}: loss_train={loss_train.item():.5f}  "
-                            f"loss_val={loss_val.item():.5f}  "
-                            f"acc_train={accuracy(logits, labels, idx_train):.5f}  "
-                            f"acc_val={accuracy(logits, labels, idx_val):.5f}")
+            if ft_it % 10 == 0:
+                logging.info(f"FT Epoch {ft_it}: CE={loss_ce.item():.4f}  DCG={loss_dcg.item():.4f}")
 
-        model.load_state_dict(best_state)
-
-        # ── Stage 2: Fine-tuning（可选）────────────────────────────────────
-        if args.fine_tune_epochs > 0:
-            del logits, loss_train, loss_val
-            torch.cuda.empty_cache()
-
-            ft_optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-            model.train()
-
-            for ft_it in range(args.fine_tune_epochs):
-                ft_optimizer.zero_grad()
-                attr_noisy  = (attr + torch.randn_like(attr) * args.sigma).detach().requires_grad_(True)
-                logits      = model(attr_noisy, adj)
-                loss_ce     = F.cross_entropy(logits[idx_train], labels[idx_train])
-                log_prob    = F.log_softmax(logits[idx_train] / args.temperature, dim=-1)
-                total_log_p = log_prob[torch.arange(len(idx_train)), labels[idx_train]].sum()
-                grad        = torch.autograd.grad(total_log_p, attr_noisy,
-                                                create_graph=True, retain_graph=True)[0]
-                loss_dcg    = (grad[idx_train] ** 2).sum(dim=1).mean()
-                total_loss  = loss_ce + args.lambda_dcg * loss_dcg
-                total_loss.backward()
-                ft_optimizer.step()
-
-                if ft_it % 10 == 0:
-                    logging.info(f"FT Epoch {ft_it}: CE={loss_ce.item():.4f}  DCG={loss_dcg.item():.4f}")
-
-                del attr_noisy, logits, grad, loss_ce, loss_dcg, total_loss
+            del attr_noisy, logits, grad, loss_ce, loss_dcg, total_loss
 
     # ── evaluate test set ────────────────────────────────────────────────────────
     model.eval()
@@ -202,7 +174,7 @@ def main(args):
     logging.info(f"Test accuracy: {test_acc:.4f}  (seed={args.seed})")
 
     # ── save model checkpoint ───────────────────────────────────────────────
-    cache_dir = Path(args.cpt_saved_dir) / args.model_type  
+    cache_dir = Path(args.artifact_dir) / args.model_type  # ← 加 surrogate/victim 子目录
     cache_dir.mkdir(parents=True, exist_ok=True)
     model_name = f"{args.dataset}-{args.model}-seed-{args.seed}.pt"
     model_path = cache_dir / model_name
